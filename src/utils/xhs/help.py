@@ -360,9 +360,12 @@ def get_search_id():
 
 
 def cookie_str_to_cookie_dict(cookie_str: str):
-    cookie_blocks = [cookie_block.split("=")
-                     for cookie_block in cookie_str.split(";") if cookie_block]
-    return {cookie[0].strip(): cookie[1].strip() for cookie in cookie_blocks}
+    try:
+        cookie_blocks = [cookie_block.split("=")
+                        for cookie_block in cookie_str.split(";") if cookie_block]
+        return {cookie[0].strip(): cookie[1].strip() for cookie in cookie_blocks}
+    except Exception:
+        raise Exception("Invalid cookie")
 
 
 def cookie_jar_to_cookie_str(cookie_jar):
