@@ -4,3 +4,10 @@ server:
 proxy:
   enabled: false
   url:
+
+encrypt:
+  key: "1234567891234567"
+  iv: "1234567891234567"
+
+database:
+  url: postgresql://postgres:postgres@localhost:5432/monkeys
