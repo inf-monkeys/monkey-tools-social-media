@@ -5,9 +5,15 @@ proxy:
   enabled: false
   url:
 
-encrypt:
-  key: "1234567891234567"
-  iv: "1234567891234567"
+rsa:
+  private_key: |
+    -----BEGIN PRIVATE KEY-----
+    MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDXKNzulGgCBUoC
+    ....
+    -----END PRIVATE KEY-----
 
-database:
-  url: postgresql://postgres:postgres@localhost:5432/monkeys
+  public_key: |
+    -----BEGIN PUBLIC KEY-----
+    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1yjc7pRoAgVKAnwaP/Ul
+    ...
+    -----END PUBLIC KEY-----

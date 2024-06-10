@@ -5,7 +5,8 @@ from src.utils.xhs.sign import sign
 from src.utils.xhs.core import XhsClient
 from src.utils.xhs.utils import beauty_print
 import re
-from .credentials_api import get_credential_data
+from src.utils.rsa import decrypt_with_private_key
+from loguru import logger
 
 xiaohongshu_ns = api.namespace("xiaohongshu", description="Xiaohongshu operations")
 
@@ -29,7 +30,7 @@ class XiaohongshuPost(Resource):
             "x-monkey-tool-categories": ["auto"],
             "x-monkey-tool-display-name": "小红书",
             "x-monkey-tool-description": "自动发布小红书帖子",
-            "x-monkey-tool-icon": "emoji:🤖️:#7fa3f8",
+            "x-monkey-tool-icon": "https://static.infmonkeys.com/logo/tools/xiaohongshu/logo.png",
             "x-monkey-tool-extra": {
                 "estimateTime": 30,
             },
@@ -51,6 +52,7 @@ class XiaohongshuPost(Resource):
                     "type": "string",
                     "default": "",
                     "required": True,
+                    "description": "标题中的话题请使用 #xxx[话题]# 格式来添加话题，例如：#美食[话题]# #旅行[话题]#"
                 },
                 {
                     "displayName": "描述信息",
@@ -133,11 +135,14 @@ class XiaohongshuPost(Resource):
     )
     def post(self):
         input_data = request.json
-        credential = input_data.get('credential', {})
-        credential_id = credential.get('id')
-        credential_data = get_credential_data(credential_id)
+        credential = input_data.get("credential", {})
+        credential_encrypted_data = credential.get("encryptedData")
+        if not credential_encrypted_data:
+            return {"message": "Invalid credential"}, 400
+        credential_data = decrypt_with_private_key(credential_encrypted_data)
 
         cookie = credential_data.get("cookie")
+        logger.info(f"Got xiaohongshu cookie: {cookie}")
         is_private = input_data.get("is_private", False)
         note_type = input_data.get("note_type", "image")
         ats = input_data.get("ats", [])
@@ -150,13 +155,19 @@ class XiaohongshuPost(Resource):
         post_time = input_data.get("post_time")
         desc = input_data.get("desc")
 
+        logger.info(
+            f"Start to post xiaohongshu note, note_type: {note_type}, title: {title}, desc: {desc}, images: {images}, video_url: {video_url}, video_cover_url: {video_cover_url}, post_time: {post_time}, ats: {ats}, is_private: {is_private}"
+        )
+
         topics = []
         if title:
             topics += extract_topics(title)
         if desc:
             topics += extract_topics(desc)
         topics = list(set(topics))
-        print("topics: ", topics)
+        logger.info(
+            f"Extracted topics: {topics}",
+        )
 
         xhs_client = XhsClient(cookie, sign=sign)
         result = None

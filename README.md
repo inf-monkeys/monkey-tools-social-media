@@ -7,6 +7,23 @@
 
 English | [中文](./README-ZH.md)
 
+### Generate RSA Key pair
+
+Generate RSA Key pair:
+
+> We use a 8192 length private key to support longer data.
+
+```bash
+# Private key
+openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:8192
+
+# Public Key
+openssl rsa -pubout -in private_key.pem -out public_key.pem
+```
+
+The public key will send to Monkeys Server to store the encrypted credentials, the private key will be used to decrpt.
+
+
 ### Configuration
 
 Create a `config.yaml` in the source root directory: 
@@ -15,6 +32,8 @@ Create a `config.yaml` in the source root directory:
 cp config.yaml.example config.yaml
 ```
 
+Be sure to replace rsa public key and private key in `config.yaml`.
+
 ## Setup
 
 ### 🐳 Docker
@@ -22,8 +41,11 @@ cp config.yaml.example config.yaml
 We provide docker image on [docker hub](https://hub.docker.com/r/infmonkeys/monkey-tools-social-media):
 
 ```sh
+# Use docker image from docker hub
 docker pull infmonkeys/monkey-tools-social-media:latest
-docker run --name monkey-tools-social-media -d -p 8891:8891 -v /path/to/config.yaml:/app/config.yaml infmonkeys/monkey-tools-social-media:latest
+# Or build docker image by your own
+# docker build . -t infmonkeys/monkey-tools-social-media:latest
+docker run --name monkey-tools-social-media -d -p 8891:8891 -v ./config.yaml:/app/config.yaml infmonkeys/monkey-tools-social-media:latest
 ```
 
 Or you can build your own using the Dockerfile:
@@ -61,7 +83,16 @@ docker build . -t monkey-tools-social-media
     playwright install-deps
     ```
 
-5. Start the API Server:
+
+6. Create `config.yaml`:
+
+    ```bash
+    cp config.yaml.example config.yaml
+    ```
+
+    And replace your RSA public key and private key.
+
+7. Start the API Server:
 
     ```bash
     python app.py

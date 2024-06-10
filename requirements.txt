@@ -5,6 +5,5 @@ playwright
 instagrapi
 pillow
 pyyaml
-peewee
-psycopg2-binary
+loguru
 pycryptodome

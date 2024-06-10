@@ -1,6 +1,7 @@
+import logging
 from flask import Flask, request
 from flask_restx import Api
-import traceback
+from src.config import public_key
 
 app = Flask(__name__)
 api = Api(
@@ -12,11 +13,8 @@ api = Api(
 
 
 @api.errorhandler(Exception)
-# Register an error handler for all exceptions
 def handle_exception(error):
-    traceback.print_exc()
-    return {'message': str(error)}, 500
-
+    return {"message": str(error)}, 500
 
 @app.before_request
 def before_request():
@@ -30,30 +28,21 @@ def before_request():
 def get_manifest():
     return {
         "schema_version": "v1",
-        "namespace": "monkey_tools_social_media",
+        "namespace": "social_media",
         "display_name": "社交应用",
         "auth": {"type": "none"},
         "api": {"type": "openapi", "url": "/swagger.json"},
         "contact_email": "dev@inf-monkeys.com",
-        "credentialEndpoints": [
-            {"type": "create", "url": "/credentials", "method": "POST"},
-            {"type": "update", "url": r"/credentials/{credentialId}", "method": "POST"},
-            {
-                "type": "delete",
-                "url": r"/credentials/{credentialId}",
-                "method": "DELETE",
-            },
-            {"type": "test", "url": "/credentials/test", "method": "DELETE"},
-        ],
+        "rsaPublicKey": public_key,
         "credentials": [
             {
                 "name": "xiaohongshu",
                 "type": "AKSK",
                 "displayName": "小红书",
-                "iconUrl": "https://static.aside.fun/upload/frame/img_v2_99283942-6e81-4051-a45c-6c7b1e0f19eg.jpg",
+                "iconUrl": "https://static.infmonkeys.com/logo/tools/xiaohongshu/logo.png",
                 "properties": [
                     {
-                        "displayName": "请前往[小红书创作服务平台](https://creator.xiaohongshu.com/) 网页获取 cookie，注意请不要退出登录，否则此 cookie 将会失效。[点击查看使用文档](https://inf-monkeys.feishu.cn/docx/Lfi6dtZHRo6mNNxfZWTc57UBnUh)。",
+                        "displayName": "请前往[小红书创作服务平台](https://creator.xiaohongshu.com/) 网页获取 cookie，注意请不要退出登录，否则此 cookie 将会失效。[点击查看使用文档](https://inf-monkeys.github.io/docs/zh-cn/tools/others/get-xiaohongshu-cookie)。",
                         "type": "notice",
                         "name": "docs",
                     },
@@ -87,3 +76,15 @@ def get_manifest():
             },
         ],
     }
+
+
+class NoSuccessfulRequestLoggingFilter(logging.Filter):
+    def filter(self, record):
+        return "GET /" not in record.getMessage()
+
+
+# 获取 Flask 的默认日志记录器
+log = logging.getLogger("werkzeug")
+# 创建并添加过滤器
+log.addFilter(NoSuccessfulRequestLoggingFilter())
+

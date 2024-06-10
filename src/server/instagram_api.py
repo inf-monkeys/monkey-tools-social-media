@@ -2,11 +2,13 @@ import json
 import uuid
 from pathlib import Path
 from instagrapi import Client
+
+from src.utils.rsa import decrypt_with_private_key
 from .app import api
 from flask_restx import Resource
 from flask import request
 
-from src.logger import logger
+from loguru import logger
 from src.utils import download_image, base64_to_bytes, get_and_ensure_exists_tmp_files_folder, save_bytes_to_image
 from src.config import config_data
 
@@ -150,11 +152,12 @@ class InstagramPost(Resource):
     def post(self):
         input_data = request.json
 
-        # TODO
-        credential_data = {}
-        if credential_data is None:
-            raise Exception("请先配置 Instagram 账号")
-
+        credential = input_data.get("credential", {})
+        credential_encrypted_data = credential.get("encryptedData")
+        if not credential_encrypted_data:
+            return {"message": "Invalid credential"}, 400
+        credential_data = decrypt_with_private_key(credential_encrypted_data)
+    
         username = credential_data.get('username')
         password = credential_data.get('password')
 
