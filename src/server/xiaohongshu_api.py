@@ -30,7 +30,7 @@ class XiaohongshuPost(Resource):
             "x-monkey-tool-categories": ["auto"],
             "x-monkey-tool-display-name": "小红书",
             "x-monkey-tool-description": "自动发布小红书帖子",
-            "x-monkey-tool-icon": "https://static.infmonkeys.com/logo/tools/xiaohongshu/logo.png",
+            "x-monkey-tool-icon": "https://inf-monkeys.oss-cn-beijing.aliyuncs.com/images/tools/xiaohongshu.png",
             "x-monkey-tool-extra": {
                 "estimateTime": 30,
             },
