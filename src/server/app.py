@@ -39,7 +39,7 @@ def get_manifest():
                 "name": "xiaohongshu",
                 "type": "AKSK",
                 "displayName": "小红书",
-                "iconUrl": "https://static.infmonkeys.com/logo/tools/xiaohongshu/logo.png",
+                "iconUrl": "https://inf-monkeys.oss-cn-beijing.aliyuncs.com/images/tools/xiaohongshu.png",
                 "properties": [
                     {
                         "displayName": "请前往[小红书创作服务平台](https://creator.xiaohongshu.com/) 网页获取 cookie，注意请不要退出登录，否则此 cookie 将会失效。[点击查看使用文档](https://inf-monkeys.github.io/docs/zh-cn/tools/others/get-xiaohongshu-cookie)。",
