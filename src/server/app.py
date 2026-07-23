@@ -2,6 +2,7 @@ import logging
 from flask import Flask, request
 from flask_restx import Api
 from src.config import public_key
+from src.capability_manifest import publish_openapi_tool_capability_manifests
 
 app = Flask(__name__)
 api = Api(
@@ -31,7 +32,7 @@ def get_manifest():
         "namespace": "social_media",
         "display_name": "社交应用",
         "auth": {"type": "none"},
-        "api": {"type": "openapi", "url": "/swagger.json"},
+        "api": {"type": "openapi", "url": "/openapi.json"},
         "contact_email": "dev@inf-monkeys.com",
         "rsaPublicKey": public_key,
         "credentials": [
@@ -78,6 +79,15 @@ def get_manifest():
     }
 
 
+@app.get("/openapi.json")
+def get_openapi():
+    return publish_openapi_tool_capability_manifests(
+        api.__schema__,
+        namespace="social_media",
+        owner_repo="monkey-tools-social-media",
+    )
+
+
 class NoSuccessfulRequestLoggingFilter(logging.Filter):
     def filter(self, record):
         return "GET /" not in record.getMessage()
@@ -87,4 +97,3 @@ class NoSuccessfulRequestLoggingFilter(logging.Filter):
 log = logging.getLogger("werkzeug")
 # 创建并添加过滤器
 log.addFilter(NoSuccessfulRequestLoggingFilter())
-
